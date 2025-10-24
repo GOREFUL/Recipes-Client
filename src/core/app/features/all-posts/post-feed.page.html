@@ -1,0 +1,48 @@
+<div class="max-w-3xl mx-auto p-4 space-y-4 h-[calc(100vh-64px)] overflow-y-auto">
+  <div class="flex justify-between items-center sticky top-0 bg-gray-800 p-2 shadow z-10 rounded-lg">
+    <h1 class="text-xl font-bold">Posts</h1>
+    <select
+      [(ngModel)]="sortMode"
+      (change)="toggleSort()"
+      class="px-3 py-2 border border-gray-700 rounded bg-gray-700 text-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+      style="min-width: 160px;"
+    >
+      <option value="subscriptions">Subscriptions</option>
+      <option value="recommendations">Recommendations</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="text-center text-gray-400">Loading...</div>
+
+  <div class="space-y-6" *ngIf="!loading">
+    <div *ngFor="let post of posts" class="bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div class="w-full aspect-video bg-black">
+        <ng-container *ngIf="post.type === 'image'">
+          <img [src]="post.mediaUrl" alt="" class="w-full h-full object-cover" />
+        </ng-container>
+        <ng-container *ngIf="post.type === 'video'">
+          <video controls class="w-full h-full object-cover">
+            <source [src]="post.mediaUrl" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </ng-container>
+      </div>
+
+      <div class="flex items-center gap-6 p-4 text-gray-300">
+        <button class="flex items-center gap-1 hover:text-red-400 transition" (click)="likePost(post)">
+          ❤️ <span>{{ post.likes }}</span>
+        </button>
+
+        <button class="flex items-center gap-1 hover:text-blue-400 transition" (click)="openComments(post)">
+          💬 <span>{{ post.comments }}</span>
+        </button>
+      </div>
+
+      <div class="px-4 pb-4">
+        <h2 class="text-lg font-semibold text-white">{{ post.title }}</h2>
+      </div>
+    </div>
+
+    <div *ngIf="loadingMore" class="text-center text-gray-400">Loading more...</div>
+  </div>
+  </div>
