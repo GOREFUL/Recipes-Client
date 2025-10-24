@@ -6,6 +6,8 @@ import { UserStatsPage } from './features/user-stats/user-stats.page';
 import { RecipeAiPage } from './features/recipe-ai/recipe-ai.page';
 import { MealPlannerPage } from './features/meal-planner/meal-planner.page';
 import { DishesPage } from './features/dish/dishes/dishes.page';
+import { PostFeedComponent } from './features/all-posts/post-feed.page';
+import { SubscriptionComponent } from './features/subscription/subscription.page';
 
 export const routes: Routes =
 [
@@ -36,6 +38,11 @@ export const routes: Routes =
   },
 
   {
+    path: 'posts',
+    component: PostFeedComponent,
+  },
+
+  {
     path: 'planner',
     component: MealPlannerPage
   },
@@ -48,6 +55,11 @@ export const routes: Routes =
   {
     path: 'stats',
     component: UserStatsPage,
+  },
+
+  {
+    path: 'subscription',
+    component: SubscriptionComponent,
   },
 
   {
