@@ -1,0 +1,31 @@
+<!-- main.layout.html -->
+<div class="flex flex-col min-h-screen">
+  
+  <!-- Header: Full width -->
+ <!-- Header -->
+<rcps-header-layout (menuClick)="onSidebarClick()"></rcps-header-layout>
+
+<!-- Main area -->
+<div class="relative flex flex-1 min-h-0">
+  <!-- Sidebar: overlay on mobile, static on md+ -->
+  <aside
+    [ngClass]="{ 'translate-x-0': sidebarActive, '-translate-x-full': !sidebarActive }"
+    class="w-64 bg-white border-r shadow-lg z-30 transform transition-transform duration-300 ease-in-out
+           fixed inset-y-0 left-0 md:static md:translate-x-0"
+  >
+    <rcps-sidebar-layout />
+  </aside>
+
+  <!-- Backdrop on mobile -->
+  <div *ngIf="sidebarActive" class="fixed inset-0 bg-black/40 z-20 md:hidden" (click)="onSidebarClick()"></div>
+
+  <!-- Page content -->
+<main class="flex-1 overflow-y-auto">
+        <router-outlet></router-outlet>
+  </main>
+</div>
+
+
+  <!-- Footer -->
+  <rcps-footer-layout></rcps-footer-layout>
+</div>

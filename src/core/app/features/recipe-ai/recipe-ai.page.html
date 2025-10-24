@@ -1,0 +1,68 @@
+<div class="p-4 max-w-xl mx-auto space-y-4">
+  <h1 class="text-xl font-bold">AI Recipe Generator</h1>
+
+  <div class="space-y-2">
+    <label class="block text-sm font-medium">Ingredients</label>
+    <textarea
+      class="w-full p-2 border rounded"
+      placeholder="e.g., eggs, cheese, mushrooms"
+      rows="4"
+      [(ngModel)]="ingredients"
+      name="ingredients"
+    ></textarea>
+    <p *ngIf="errorMsg" class="text-red-600 text-sm">{{ errorMsg }}</p>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <button
+      class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+      (click)="generateRecipes()
+      "
+      [disabled]="loading"
+    >
+      {{ loading ? 'Generating...' : 'Get Recipes' }}
+    </button>
+
+    <button
+      type="button"
+      class="px-3 py-2 border rounded hover:bg-gray-50"
+      (click)="clear()"
+      [disabled]="loading"
+    >
+      Clear
+    </button>
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="!loading && suggestions.length" class="space-y-4">
+    <div *ngFor="let r of suggestions" class="p-4 border rounded space-y-2">
+      <h2 class="font-semibold text-lg">
+        {{ r.title || 'Untitled' }}
+      </h2>
+
+      <p *ngIf="r.description">{{ r.description }}</p>
+
+      <div *ngIf="r.ingredients?.length">
+        <h3 class="font-medium">Ingredients:</h3>
+        <ul class="list-disc ml-5">
+          <li *ngFor="let ing of r.ingredients">
+            {{ ing.name }}<span *ngIf="ing.amount"> — {{ ing.amount }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="r.steps?.length">
+        <h3 class="font-medium">Steps:</h3>
+        <ol class="list-decimal ml-5">
+          <li *ngFor="let s of r.steps">
+            <span *ngIf="s.index">{{ s.index }}. </span>{{ s.text }}
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!loading && !suggestions.length && !errorMsg" class="text-sm text-gray-500">
+    No recipes yet — enter ingredients and click “Get Recipes”.
+  </p>
+</div>

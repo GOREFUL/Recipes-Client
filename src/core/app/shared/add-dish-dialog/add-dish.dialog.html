@@ -1,0 +1,54 @@
+<div class="card p-5">
+  <h2 class="text-xl font-semibold mb-4" style="color:var(--text)">Add New Dish</h2>
+
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="space-y-4">
+    <!-- Name -->
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Name*</mat-label>
+      <input matInput formControlName="name" required />
+      <mat-hint>e.g. Pasta Carbonara</mat-hint>
+      <mat-error *ngIf="f.name.touched && f.name.invalid">Name is required</mat-error>
+    </mat-form-field>
+
+    <!-- Description -->
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput cdkTextareaAutosize formControlName="description" rows="3"></textarea>
+      <mat-hint align="end">{{ (formGroup.get('description')?.value?.length || 0) }}/500</mat-hint>
+      <mat-error *ngIf="f.description.hasError('maxlength')">Max 500 characters</mat-error>
+    </mat-form-field>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <mat-form-field appearance="fill">
+        <mat-label>Time (min)</mat-label>
+        <input matInput type="number" min="0" step="1" formControlName="time" />
+        <mat-error *ngIf="f.time.hasError('min')">Must be ≥ 0</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Yield (portions)</mat-label>
+        <input matInput type="number" min="1" step="1" formControlName="yield" />
+        <mat-error *ngIf="f.yield.hasError('min')">At least 1</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Serving Size (g)</mat-label>
+        <input matInput type="number" min="1" step="1" formControlName="servingSize" />
+        <mat-error *ngIf="f.servingSize.hasError('min')">At least 1</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Note</mat-label>
+        <input matInput formControlName="note" maxlength="120" />
+        <mat-hint align="end">{{ (formGroup.get('note')?.value?.length || 0) }}/120</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" class="btn btn-ghost" (click)="onClose()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">Add</button>
+    </div>
+  </form>
+</div>

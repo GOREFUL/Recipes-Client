@@ -1,0 +1,33 @@
+<section class="w-full space-y-6">
+  <!-- Page Top Controls -->
+  <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-4 p-4">
+    <h1 class="text-2xl font-bold" style="color: var(--text)">Dishes</h1>
+
+    <div class="flex flex-wrap gap-2">
+      <button class="btn btn-primary btn-lg" (click)="onAdd()">
+        <mat-icon>add</mat-icon><span>Add Dish</span>
+      </button>
+
+      <button class="btn btn-soft btn-lg" (click)="onRefresh()">
+        <mat-icon>refresh</mat-icon><span>Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dishes List -->
+  <div *ngIf="dishSrvc.dishes.length; else emptyState" class="grid gap-4">
+    <rcps-dish-item
+      *ngFor="let dish of dishSrvc.dishes()"
+      [dish]="dish"
+      (edit)="onEdit(dish)"
+      (delete)="onDelete(dish)"/>
+  </div>
+
+  <!-- Empty State -->
+  <ng-template #emptyState>
+    <div class="text-center py-20" style="color: var(--muted)">
+      <mat-icon class="text-4xl mb-2">restaurant_menu</mat-icon>
+      <p>No dishes found. Add a new one to get started.</p>
+    </div>
+  </ng-template>
+</section>

@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+/* ===== Dark base ===== */
+:root {
+  --bg: #0f1218;           /* главный фон */
+  --bg-soft: #151a23;      /* поверхности/карточки */
+  --bg-elev: #1b2230;      /* поднятые поверхности */
+  --text: #e6e9ef;         /* основной текст */
+  --muted: #9aa3b2;        /* вторичный текст */
+  --brand: #6ea8fe;        /* акцент/ссылки */
+  --ok: #4ade80;           /* успех */
+  --warn: #fbbf24;         /* предупреждения */
+  --err: #f87171;          /* ошибки */
+  --ring: 0 0 0 2px rgba(110,168,254,.35);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== Background pattern (ненавязчивый) ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 800px at 80% -10%, rgba(110,168,254,.08), transparent 60%),
+    radial-gradient(900px 600px at -10% 100%, rgba(74,222,128,.08), transparent 60%),
+    url("/assets/img/cooking-pattern.png");
+  background-size: cover, cover, 900px 900px;   /* подгони 3-е значение под размер твоей PNG */
+  background-repeat: no-repeat, no-repeat, repeat;
+  opacity: .12;  /* чтобы еле-еле читался */
+  z-index: 0;
+}
+
+/* ===== Карточки / панели ===== */
+.card {
+  background: var(--bg-soft);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+}
+
+/* ===== Интерактив ===== */
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button, .btn {
+  background: var(--bg-elev);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: .6rem .9rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .15s ease;
+}
+button:hover, .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.16); }
+button:focus-visible, .btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* Вариант кнопки: primary */
+.btn-primary { background: var(--brand); color: #0a0d14; border-color: transparent; }
+.btn-primary:hover { filter: brightness(1.05); }
+
+/* ===== Инпуты ===== */
+input, select, textarea {
+  background: var(--bg-elev);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text);
+  border-radius: 12px;
+  padding: .65rem .8rem;
+}
+input::placeholder { color: var(--muted); }
+
+/* ===== Тёмный скроллбар (WebKit) ===== */
+*::-webkit-scrollbar { height: 12px; width: 12px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.12);
+  border-radius: 12px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.18); }
+
+/* Немного утрамбовать Angular Material в дарк (если используешь) */
+.mat-mdc-form-field, .mdc-text-field, .mat-mdc-card, .mat-mdc-menu-panel {
+  --mdc-theme-surface: var(--bg-soft);
+  --mdc-theme-on-surface: var(--text);
+  color-scheme: dark;
+}
+/* ----- Dark Material for sidebar accordion ----- */
+.sidebar-acc .mat-expansion-panel {
+  background: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.sidebar-acc .mat-expansion-panel-header {
+  background: transparent;
+  color: var(--text);
+}
+.sidebar-acc .mat-expansion-panel-header:hover {
+  background: rgba(255,255,255,.04);
+}
+.sidebar-acc .mat-expansion-panel-content {
+  background: linear-gradient(180deg, var(--bg-soft), var(--bg) 120%);
+}
+
+/* ссылки/иконки в сайдбаре */
+.sidebar-link {
+  color: var(--text);
+  opacity: .9;
+}
+.sidebar-link:hover { background: rgba(255,255,255,.05); opacity: 1; }
+.sidebar-muted { color: var(--muted); }
+
+/* хедер «стекло» */
+.header-glass {
+  backdrop-filter: blur(8px);
+  background: rgba(15,18,24,.65);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+/* активные ссылки в хедере */
+.nav-link { color: var(--text); opacity: .9; }
+.nav-link:hover { opacity: 1; text-decoration: none; }
+.nav-link-active { color: var(--brand) !important; opacity: 1 !important; }
+
+/* кнопка "Logout" в хедере */
+.btn-ghost {
+  background: var(--bg-elev);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text);
+  padding: .45rem .7rem;
+  border-radius: 10px;
+}
+.btn-ghost:hover { background: rgba(255,255,255,.06); }
+.app-brand{
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--text);
+  text-decoration: none;
+}
+.app-brand:hover{ opacity: .95; }
+/* универсальные тёмные кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;                       /* расстояние между иконкой и текстом */
+  padding: 10px 14px;             /* вертикаль/горизонталь */
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: var(--bg-elev);
+  color: var(--text);
+  line-height: 1;                 /* чтобы иконка не «прыгала» */
+  cursor: pointer;
+  transition: .15s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+.btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.16); }
+.btn:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.btn-lg { padding: 12px 18px; border-radius: 16px; }
+
+.btn-primary {
+  background: var(--brand);
+  color: #0a0d14;
+  border-color: transparent;
+}
+.btn-soft {
+  background: var(--bg-soft);
+}
+
+/* иконки внутри кнопок — одинакового размера и по центру */
+.btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  vertical-align: middle;
+}
+.cal-day{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.cal-day:hover{
+  background: rgba(255,255,255,.04);              /* не белесый, а деликатный дарк-hover */
+  border-color: rgba(110,168,254,.35);            /* синий акцент (brand) */
+  box-shadow: inset 0 0 0 2px rgba(110,168,254,.12);
+}
+.cal-day--selected{
+  border-color:#60a5fa;
+  box-shadow: inset 0 0 0 2px rgba(96,165,250,.35);
+}
+.cal-day--out{ opacity:.5; }
+.cal-day .day-num{ color:var(--text); }
+.cal-day:hover .day-num{ color:#93c5fd; }         /* цифра становится чуть синей */
+.today-chip{ background: rgba(96,165,250,.15); color:#93c5fd; }
+.today-dot{ background:#60a5fa; }
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  /* градиенты для объёма + сам паттерн (tileable) */
+  background-image:
+    radial-gradient(1200px 800px at 80% -10%, rgba(110,168,254,.08), transparent 60%),
+    radial-gradient(900px 600px at -10% 100%, rgba(74,222,128,.08), transparent 60%),
+    url("/images/cooking-pattern.png");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: cover, cover, 640px 640px; /* размер плитки подгони по вкусу */
+  opacity: .10; /* интенсивность фона */
+}
+
+/* гарантируем, что контент над фоном */
+body > * { position: relative; z-index: 1; }
+
+/* чуть тише на мобилке */
+@media (max-width: 768px){
+  body::before{ opacity: .08; background-size: cover, cover, 480px 480px; }
+}
+/* Дарк для мат-полей внутри .card */
+.card .mdc-text-field--filled{
+  background:#2a2f3a !important;
+  border-radius:12px !important;
+}
+.card .mdc-line-ripple::after{ border-bottom-color: var(--brand); }
+.card mat-error{ color: var(--err); }
+/* --- Dish card (dark) --- */
+.dish-card{
+  background: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.28);
+}
+.dish-title{ font-size: 18px; font-weight: 700; color: var(--text); }
+.dish-desc{ font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* buttons */
+.icon-btn{
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 10px;
+  width: 36px; height: 36px;
+  transition: .12s ease;
+}
+.icon-btn:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.18); }
+.icon-btn.danger:hover{ background: rgba(248,113,113,.14); border-color: rgba(248,113,113,.45); }
+.dish-card mat-icon{ color: var(--text); opacity: .9; }
+
+/* meta row */
+.dish-meta{
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 8px; font-size: 12px;
+}
+.meta-chip{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text);
+}
+.meta-chip mat-icon{ font-size:16px; width:16px; height:16px; opacity:.9; }
+.post-card{
+  background: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* media area with 16:9 aspect */
+.media-wrap{ position: relative; width: 100%; aspect-ratio: 16 / 9; background:#0b0f16; }
+.media-el{ width:100%; height:100%; object-fit: cover; display:block; border:0; outline:none; }
+.no-media{ width:100%; height:100%; display:grid; place-items:center; color:var(--muted); }
+
+.post-title{ font-size:16px; font-weight:700; margin:0; }
+.post-desc{ font-size:13px; color:var(--muted); margin:.25rem 0 0; }
+
+.actions{
+  display:flex; align-items:center; gap:8px;
+  padding: 8px 12px 12px; color:var(--text);
+}
+.act-btn{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:10px; width:36px; height:36px;
+  transition:.12s ease;
+}
+.act-btn:hover{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18); }
+.count{ min-width:22px; text-align:center; font-size:13px; }
+
+.spacer{ flex:1 }
+.muted{ color:var(--muted); }

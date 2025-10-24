@@ -1,0 +1,29 @@
+<div class="p-4 flex flex-col gap-4">
+  <!-- New Comment Input -->
+  <div class="flex gap-2 items-end">
+    <mat-form-field class="w-full" appearance="outline">
+      <mat-label>Write a comment</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        [(ngModel)]="text"
+        placeholder="Share your thoughts...">
+      </textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onSend()">
+      Send
+    </button>
+  </div>
+
+  <!-- Comments List -->
+  <div class="flex flex-col gap-2">
+    <rcps-comment-item
+      *ngFor="let comment of comments"
+      [comment]="comment"
+      (like)="onLike(comment)"
+      (dislike)="onDislike(comment)"
+      (report)="onReport(comment)"
+    />
+  </div>
+</div>

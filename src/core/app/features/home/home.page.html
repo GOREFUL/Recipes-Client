@@ -1,0 +1,25 @@
+<!-- Обёртка с фиксированной высотой и скроллом -->
+<div class="max-w-md mx-auto p-4 space-y-4 h-[calc(100vh-64px)] overflow-y-auto">
+
+    <!-- Верхняя панель с заголовком и селектом -->
+    <div class="flex justify-between items-center sticky top-0  p-2 shadow z-10">
+      <h1 class="text-xl font-bold">Video Feed</h1>
+      <select
+        class="px-3 py-2 border rounded  cursor-pointer"
+        style="min-width: 160px;"
+      >
+        <option value="subscriptions">Subscriptions</option>
+        <option value="recommendations">Recommendations</option>
+      </select>
+    </div>
+    
+    <!-- Лента постов -->
+    <div class="space-y-6" *ngIf="!postSrvc.posts()">
+      <rcps-post-item
+      *ngFor="let post of postSrvc.posts()" 
+      post]="post" (like)="onLike(post)"
+      (dislike)="onDislike(post)">
+      </rcps-post-item>
+    </div>
+</div>
+  

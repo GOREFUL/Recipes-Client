@@ -1,0 +1,69 @@
+<div class="p-4 space-y-4 max-w-5xl mx-auto">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold">Meal Planner</h1>
+
+    <div class="flex items-center gap-2">
+      <button class="px-3 py-1 border rounded" (click)="prevMonth()">&larr;</button>
+      <div class="min-w-[180px] text-center font-medium">{{ monthLabel() }}</div>
+      <button class="px-3 py-1 border rounded" (click)="nextMonth()">&rarr;</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-sm opacity-70">Loading...</div>
+
+  <!-- Calendar grid -->
+  <div class="grid grid-cols-7 gap-2">
+    <div class="text-xs text-gray-500 text-center">Mon</div>
+    <div class="text-xs text-gray-500 text-center">Tue</div>
+    <div class="text-xs text-gray-500 text-center">Wed</div>
+    <div class="text-xs text-gray-500 text-center">Thu</div>
+    <div class="text-xs text-gray-500 text-center">Fri</div>
+    <div class="text-xs text-gray-500 text-center">Sat</div>
+    <div class="text-xs text-gray-500 text-center">Sun</div>
+<div
+  *ngFor="let d of days"
+  class="cal-day relative p-2 sm:p-2 flex flex-col gap-2 cursor-pointer"
+  [class.cal-day--out]="!d.inMonth"
+  [class.cal-day--selected]="sameDay(selectedDate, d.date)"
+  (click)="selectDay(d.date)"
+>
+  <div class="flex items-center justify-between">
+    <div class="text-sm font-medium day-num" [class.text-blue-400]="isToday(d.date)">
+      {{ d.date.split('-')[2] }}
+    </div>
+
+    <!-- today: текст на десктопе, точка на мобиле -->
+    <span *ngIf="isToday(d.date)" class="today-chip hidden md:inline-flex items-center text-[10px] px-1.5 py-0.5 rounded">
+      today
+    </span>
+    <span *ngIf="isToday(d.date)" class="today-dot md:hidden absolute top-1 right-1 w-1.5 h-1.5 rounded-full"></span>
+  </div>
+
+  <ul class="space-y-1">
+    <!-- ... -->
+  </ul>
+</div>
+
+  </div>
+
+  <!-- Editor for selected day -->
+  <div class="border rounded p-3 space-y-3">
+    <div class="text-sm">
+      <span class="font-medium">Selected:</span> {{ selectedDate }}
+    </div>
+
+    <div class="flex items-center gap-2">
+      <input
+        class="flex-1 border rounded px-2 py-1"
+        placeholder="Dish name..."
+        [(ngModel)]="newDish"
+        (keyup.enter)="addDish()"
+      />
+      <button class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700" (click)="addDish()">Add</button>
+    </div>
+
+    <div class="text-xs text-gray-500">
+      * You can add dishes only for today and upcoming days.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<mat-card class="dish-card">
+  <!-- header -->
+  <div class="flex justify-between items-start gap-3">
+    <div class="min-w-0">
+      <h2 class="dish-title truncate">{{ dish?.name }}</h2>
+      <p class="dish-desc">{{ dish?.description }}</p>
+    </div>
+
+    <div class="flex gap-2 shrink-0">
+      <button mat-icon-button class="icon-btn" (click)="onEdit()" aria-label="Edit dish">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button class="icon-btn danger" (click)="onDelete()" aria-label="Delete dish">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- meta -->
+  <div class="dish-meta">
+    <span class="meta-chip">
+      <mat-icon>schedule</mat-icon>
+      {{ dish?.cookInfo?.time || 0 }} min
+    </span>
+    <span class="meta-chip">
+      <mat-icon>restaurant</mat-icon>
+      {{ dish?.cookInfo?.yield || 1 }} portions
+    </span>
+    <span class="meta-chip">
+      <mat-icon>scale</mat-icon>
+      {{ dish?.cookInfo?.servingSize || 0 }} g
+    </span>
+  </div>
+</mat-card>
