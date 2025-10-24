@@ -3,25 +3,20 @@ import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private router: Router) {}
-
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = localStorage.getItem('token') || '';
+    const token = localStorage.getItem('token');
 
-    const authReq = token
+    const isAuthCall = /\/api\/identity\/(login|register)/.test(req.url);
+    const authReq = (token && !isAuthCall)
       ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
       : req;
 
     return next.handle(authReq).pipe(
       catchError((err: HttpErrorResponse) => {
-        if (err.status === 401) {
-          localStorage.removeItem('token');
-          this.router.navigate(['/login']);
-        }
+        // НЕ редиректим. Просто отдаём ошибку наверх — UI сам решит что показать.
         return throwError(() => err);
       })
     );

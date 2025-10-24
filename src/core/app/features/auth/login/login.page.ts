@@ -1,5 +1,5 @@
 /*
- * Files        : login.page.ts, login.page.html
+ * Files        : login.page.ts
  * Description  : Login page. Gives possibility to authorize using credentials.
  * Author       : Kuts Vladyslav Ivanovich
  */
@@ -11,9 +11,9 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'; 
+import { MatIconModule } from '@angular/material/icon';
 
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { Credentials } from '../../../../utils/credentials.util';
 
 import { UtilsFactory } from '../../../../factories/utils.factory';
@@ -29,31 +29,60 @@ import { AuthSrvc } from '../../../../services/network/auth.service';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    RouterModule
+    RouterModule,
   ],
 })
 /**
  * Handles login logic of the application
 */
 export class LoginPage {
-  private readonly _authSrvc = inject(AuthSrvc);
+  private readonly _auth = inject(AuthSrvc);
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
 
   /** Target input model of user credentials */
   public readonly data: Credentials = UtilsFactory.createCredentials();
+  public loading = false;
+
+  private getReturnUrl(): string {
+    return this._route.snapshot.queryParamMap.get('returnUrl') || '/home';
+  }
 
   public onSubmit(): void {
-    this._authSrvc.login(this.data).subscribe({
-      next: () => this._router.navigate(['/']),   // редирект после успеха
-      error: (e) => console.error('Login error', e),
+    if (this.loading) return;
+    this.loading = true;
+
+    this._auth.login(this.data).subscribe({
+      next: () => {
+        this._auth.initMe();
+        this.loading = false;
+        
+this._router.navigate(['/home']);
+      },
+      error: (e) => {
+        this.loading = false;
+        console.error('Login error', e);
+        alert(e?.message || 'Login failed');
+      },
     });
   }
 
-  /** Google login via Firebase -> exchange on backend */
+  /** Google login via Firebase -> register/login on backend */
   public googleLogin(): void {
-    this._authSrvc.loginWithGoogle().subscribe({
-      next: () => this._router.navigate(['/']),
-      error: (e) => console.error('Google login error', e),
+    if (this.loading) return;
+    this.loading = true;
+
+    this._auth.googleLogin().subscribe({
+      next: () => {
+        this._auth.initMe();
+        this.loading = false;
+this._router.navigate(['/home']);
+      },
+      error: (e) => {
+        this.loading = false;
+        console.error('Google login error', e);
+        alert(e?.message || 'Google sign-in failed');
+      },
     });
   }
 }

@@ -1,33 +1,38 @@
 <!-- ВНЕШНЯЯ ОБЁРТКА: центрируем по экрану -->
 <div class="min-h-[70vh] flex items-center justify-center px-4">
-
-  <!-- КАРТОЧКА: фиксируем ширину -->
+  <!-- КАРТОЧКА -->
   <div class="w-full max-w-md rounded-2xl p-6 shadow-xl"
        style="background: var(--bg-soft); border:1px solid rgba(255,255,255,.08)">
 
     <h1 class="text-center text-2xl font-semibold mb-4" style="color:var(--text)">Sign up</h1>
 
-    <!-- ФОРМА: ширина = 100% внутри карточки -->
-    <form (ngSubmit)="onSubmit()" class="space-y-4">
+    <form (ngSubmit)="onSubmit()" class="space-y-4" #f="ngForm">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Display name*</mat-label>
+        <input matInput name="displayName" [(ngModel)]="data.displayName" required />
+      </mat-form-field>
 
       <mat-form-field appearance="fill" class="w-full">
         <mat-label>Email*</mat-label>
-        <input matInput type="email" [(ngModel)]="data.email" name="email" required />
+        <input matInput type="email" name="email" [(ngModel)]="data.email" required />
       </mat-form-field>
 
       <mat-form-field appearance="fill" class="w-full">
         <mat-label>Password*</mat-label>
-        <input matInput type="password" [(ngModel)]="data.password" name="password" required />
+        <input matInput type="password" name="password" [(ngModel)]="data.password" required />
       </mat-form-field>
 
-      <button class="btn btn-primary w-full" type="submit">
-        <mat-icon>person_add</mat-icon> Create account
+      <button class="btn btn-primary w-full" mat-raised-button color="primary"
+              type="submit" [disabled]="loading || f.invalid">
+        <mat-icon>person_add</mat-icon>
+        {{ loading ? 'Creating...' : 'Create account' }}
       </button>
     </form>
 
     <div class="text-center my-3" style="color:var(--muted)">or</div>
 
-    <button class="btn btn-google w-full" type="button" (click)="googleRegister()">
+    <button class="btn btn-google w-full" type="button"
+            (click)="googleRegister()" [disabled]="loading">
       <img src="/images/google.svg" alt="" width="18" height="18" />
       Continue with Google
     </button>

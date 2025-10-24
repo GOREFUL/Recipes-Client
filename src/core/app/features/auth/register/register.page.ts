@@ -11,53 +11,88 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'; 
+import { MatIconModule } from '@angular/material/icon';
 
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 
-import { Credentials } from '../../../../utils/credentials.util';
-import { UtilsFactory } from '../../../../factories/utils.factory';
 import { AuthSrvc } from '../../../../services/network/auth.service';
-import { Router } from '@angular/router';
-@Component
-({
+
+@Component({
   selector: 'rcps-register-page',
+  standalone: true,
   templateUrl: 'register.page.html',
-  imports:
-  [
+  imports: [
     CommonModule,
     FormsModule,
-
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-MatIconModule,
-    RouterModule
+    MatIconModule,
+    RouterModule,
   ],
 })
 /**
  * Handles register logic of the application
 */
-export class RegisterPage
-{
+export class RegisterPage {
   private readonly _auth = inject(AuthSrvc);
   private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
 
-  private readonly _authSrvc: AuthSrvc = inject(AuthSrvc)
+  /** Бэку требуется displayName */
+  public data = {
+    displayName: '',
+    email: '',
+    password: '',
+  };
 
-  /**
-   * Target input model of user credentials
-  */
-  public readonly data: Credentials = UtilsFactory.createCredentials();
+  public loading = false;
 
-  public onSubmit(): void
-  {
-    this._authSrvc.register(this.data);
+  private getReturnUrl(): string {
+    return this._route.snapshot.queryParamMap.get('returnUrl') || '/home';
   }
-    googleRegister() {
-    this._auth.registerWithGoogle().subscribe({
-      next: () => this._router.navigate(['/home']),
-      error: (e) => console.error('Google register error', e),
+
+  public onSubmit(): void {
+    if (this.loading) return;
+    if (!this.data.email || !this.data.password) return;
+
+    const dto = {
+      displayName: this.data.displayName?.trim() || this.data.email.split('@')[0],
+      email: this.data.email.trim(),
+      password: this.data.password,
+    };
+
+    this.loading = true;
+    this._auth.register(dto).subscribe({
+      next: () => {
+        this._auth.initMe();
+        this.loading = false;
+this._router.navigate(['/home']);
+      },
+      error: (e) => {
+        this.loading = false;
+        console.error('Register error', e);
+        alert(e?.message || 'Register failed');
+      },
+    });
+  }
+
+  /** Google → popup → регистр/логин на бэке (см. реализацию в AuthSrvc) */
+  public googleRegister(): void {
+    if (this.loading) return;
+    this.loading = true;
+
+    this._auth.googleRegister().subscribe({
+      next: () => {
+        this._auth.initMe();
+        this.loading = false;
+this._router.navigate(['/home']);
+      },
+      error: (e) => {
+        this.loading = false;
+        console.error('Google register error', e);
+        alert(e?.message || 'Google sign-in failed');
+      },
     });
   }
 }

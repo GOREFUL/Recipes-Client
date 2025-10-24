@@ -1,25 +1,19 @@
 <header class="header-glass sticky top-0 z-40">
-  <!-- убрали max-w-6xl mx-auto и justify-between -->
   <div class="px-4 py-3 flex items-center">
-    <!-- бренд слева -->
-    <a routerLink="/" class="text-[18px] font-semibold app-brand">Recipes</a>
+    <a routerLink="/home" class="text-[18px] font-semibold app-brand">Recipes</a>
 
-    <!-- меню справа -->
     <nav class="ml-auto flex items-center gap-4">
-      <!-- Mobile menu -->
       <button (click)="onMenuClick()" class="md:hidden inline-flex items-center gap-1 nav-link">
-        <mat-icon fontIcon="menu"></mat-icon> Menu
+        <mat-icon fontIcon="menu"></mat-icon><span class="hidden sm:inline">Menu</span>
       </button>
 
-      <!-- Desktop links -->
       <a routerLink="/home" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }"
          class="hidden md:inline nav-link">Home</a>
 
-      <!-- Auth -->
-      <ng-container *ngIf="auth.isLoggedIn(); else guest">
+      <ng-container *ngIf="isLoggedIn(); else guest">
         <div class="flex items-center gap-3">
-          <img *ngIf="photoURL" [src]="photoURL!" width="28" height="28" style="border-radius:50%">
-          <span class="text-sm">{{ displayName || 'User' }}</span>
+          <img [src]="photoURL" width="28" height="28" class="rounded-full ring-1 ring-white/10" alt="avatar" />
+          <span class="text-sm">{{ displayName }}</span>
           <button type="button" (click)="logout()" class="btn-ghost inline-flex items-center gap-1">
             <mat-icon fontIcon="logout"></mat-icon>
             <span class="hidden sm:inline">Logout</span>
