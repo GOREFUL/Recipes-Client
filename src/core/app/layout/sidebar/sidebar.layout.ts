@@ -48,11 +48,13 @@ export class SidebarLayout
 
       UtilsFactory.createMenuItem('Posts', 'article', '/posts'),
 
-      UtilsFactory.createMenuItem('Planner', '', '/planner'),
+      UtilsFactory.createMenuItem('Planner', 'event', '/planner'),
 
-      UtilsFactory.createMenuItem('AI', '', '/ai'),
+      UtilsFactory.createMenuItem('AI', 'smart_toy', '/ai'),
 
-      UtilsFactory.createMenuItem('Stats', '', '/stats'),
+      UtilsFactory.createMenuItem('Stats', 'bar_chart', '/stats'),
+
+      UtilsFactory.createMenuItem('Subscription', 'workspace_premium', '/subscription'),
 
       UtilsFactory.createMenuItem('Settings', 'settings', '/settings')
   ]);
