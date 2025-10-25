@@ -1,34 +1,22 @@
 <mat-card class="post-card">
   <!-- media -->
   <div class="media-wrap">
-    <ng-container *ngIf="videoUrl; else noVideo">
-      <video [src]="videoUrl" controls playsinline class="media-el"></video>
+    <ng-container *ngIf="post?.mediaUrl; else noMedia">
+      <img [src]="post!.mediaUrl" alt="Post image" class="media-el" />
     </ng-container>
-    <ng-template #noVideo>
-      <div class="no-media">No video</div>
+
+    <ng-template #noMedia>
+      <div class="no-media">No image</div>
     </ng-template>
   </div>
 
   <!-- header/title -->
   <div class="px-3 pt-3">
-    <h2 class="post-title">{{ post?.name || 'Untitled post' }}</h2>
-    <p class="post-desc" *ngIf="post?.description">{{ post?.description }}</p>
+    <h2 class="post-title">{{ post?.title || 'Untitled post' }}</h2>
   </div>
 
-  <!-- actions -->
-  <div class="actions">
-    <button mat-icon-button class="act-btn" (click)="onLike()" aria-label="Like">
-      <mat-icon>thumb_up</mat-icon>
-    </button>
-    <span class="count">{{ post?.socialData?.likes || 0 }}</span>
-
-    <button mat-icon-button class="act-btn" (click)="onDislike()" aria-label="Dislike">
-      <mat-icon>thumb_down</mat-icon>
-    </button>
-    <span class="count">{{ post?.socialData?.dislikes || 0 }}</span>
-
-    <span class="spacer"></span>
-
-    <span class="muted text-xs" *ngIf="post?.createdAt">{{ timeAgo(post!.createdAt) }}</span>
+  <!-- description -->
+  <div class="px-3 pb-3">
+    <p>{{ post?.description }}</p>
   </div>
 </mat-card>

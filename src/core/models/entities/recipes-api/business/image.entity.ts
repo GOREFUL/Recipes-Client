@@ -7,6 +7,6 @@
 
 export interface Image
 {
-  image: Blob | File;
+  image: string;
   description: string;
 }

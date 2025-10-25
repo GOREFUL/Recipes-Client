@@ -1,9 +1,8 @@
 export interface Post {
-    id: number;
-    type: 'image' | 'video';
-    mediaUrl: string;
-    title: string;
-    likes: number;
-    comments: number;
-  }
+  id: number;
+  mediaUrl: string;
+  description: string;
+  title: string;
+  dishId: number;
+}
   

@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { PostItem } from '../../shared/post-card/post.item';
 
 import { PostSrvc } from '../../../services/network/post.service';
-import { Post } from '../../../models/entities/recipes-api/social/post.entity';
+import { Post } from '../../../models/entities/recipes-api/business/post.entity';
 
 @Component
 ({

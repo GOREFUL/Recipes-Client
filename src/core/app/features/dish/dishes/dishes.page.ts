@@ -45,16 +45,22 @@ export class DishesPage implements OnInit
   }
 
   public onAdd(): void
-  {
-    const dialogRef = this.matDialog.open
-      (AddDishDialog, { width: '500px', disableClose: true });
+{
+  const dialogRef = this.matDialog.open(AddDishDialog, {
+    width: '90vw',  
+    maxWidth: '1200px', 
+    height: '90vh', 
+    disableClose: true,
+    panelClass: 'custom-dialog-container'
+  });
 
-      dialogRef.afterClosed().subscribe((value: Dish | undefined) =>
-      {
-        if (value)
-        { this.dishSrvc.add(value); }
-      });
-  }
+  dialogRef.afterClosed().subscribe((value: Dish | undefined) =>
+  {
+    if (value) {
+      this.dishSrvc.add(value);
+    }
+  });
+}
 
   public onEdit(dish: Dish): void
   {

@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { Post } from '../../models/entities/recipes-api/social/post.entity';
+import { Post } from '../../models/entities/recipes-api/business/post.entity';
 
 import { environment } from '../../../environments/environment.dev';
 

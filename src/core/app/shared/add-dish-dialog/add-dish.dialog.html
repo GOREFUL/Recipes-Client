@@ -1,54 +1,170 @@
-<div class="card p-5">
-  <h2 class="text-xl font-semibold mb-4" style="color:var(--text)">Add New Dish</h2>
+<div class="card p-6 max-h-[90vh] overflow-y-auto space-y-6 w-[90vw] max-w-[1200px] mx-auto">
+  <h2 class="text-2xl font-semibold" style="color: var(--text)">Add New Dish</h2>
 
-  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="space-y-4">
-    <!-- Name -->
-    <mat-form-field class="w-full" appearance="fill">
-      <mat-label>Name*</mat-label>
-      <input matInput formControlName="name" required />
-      <mat-hint>e.g. Pasta Carbonara</mat-hint>
-      <mat-error *ngIf="f.name.touched && f.name.invalid">Name is required</mat-error>
-    </mat-form-field>
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="space-y-6">
+    
+    <section>
+      <h3 class="text-lg font-medium mb-2">Basic Info</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <mat-form-field appearance="fill">
+          <mat-label>Name*</mat-label>
+          <input matInput formControlName="name" required />
+        </mat-form-field>
 
-    <!-- Description -->
-    <mat-form-field class="w-full" appearance="fill">
-      <mat-label>Description</mat-label>
-      <textarea matInput cdkTextareaAutosize formControlName="description" rows="3"></textarea>
-      <mat-hint align="end">{{ (formGroup.get('description')?.value?.length || 0) }}/500</mat-hint>
-      <mat-error *ngIf="f.description.hasError('maxlength')">Max 500 characters</mat-error>
-    </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Description</mat-label>
+          <textarea matInput rows="3" formControlName="description"></textarea>
+        </mat-form-field>
+      </div>
+    </section>
 
-    <!-- Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <mat-form-field appearance="fill">
-        <mat-label>Time (min)</mat-label>
-        <input matInput type="number" min="0" step="1" formControlName="time" />
-        <mat-error *ngIf="f.time.hasError('min')">Must be ≥ 0</mat-error>
+    <section>
+      <h3 class="text-lg font-medium mb-2">Cuisine</h3>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label>Select cuisines</mat-label>
+        <mat-select formControlName="cuisines" multiple>
+          <mat-option *ngFor="let cuisine of availableCuisines" [value]="cuisine.name">
+            {{ cuisine.name }}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
+    </section>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Yield (portions)</mat-label>
-        <input matInput type="number" min="1" step="1" formControlName="yield" />
-        <mat-error *ngIf="f.yield.hasError('min')">At least 1</mat-error>
+    <section>
+      <h3 class="text-lg font-medium mb-2">Allergies</h3>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label>Select allergies</mat-label>
+        <mat-select formControlName="allergies" multiple>
+          <mat-option *ngFor="let allergy of availableAllergies" [value]="allergy.name">
+            {{ allergy.name }}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
+    </section>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Serving Size (g)</mat-label>
-        <input matInput type="number" min="1" step="1" formControlName="servingSize" />
-        <mat-error *ngIf="f.servingSize.hasError('min')">At least 1</mat-error>
-      </mat-form-field>
+    <section>
+      <h3 class="text-lg font-medium mb-2">Ingredients</h3>
+      <table class="w-full text-sm border border-gray-700 bg-gray-800 text-gray-100">
+        <thead class="bg-gray-900 text-gray-100">
+          <tr>
+            <th class="p-2 text-left">Ingredient</th>
+            <th class="p-2 text-left">Measure</th>
+            <th class="p-2 text-left">Value</th>
+            <th class="p-2 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="ingredients">
+          <tr *ngFor="let ing of ingredients.controls; let i = index" [formGroupName]="i" class="border-b border-gray-700">
+            <td class="p-2 w-1/3">
+              <mat-form-field class="w-full" appearance="fill" color="primary">
+                <mat-label>Ingredient</mat-label>
+                <mat-select formControlName="name">
+                  <mat-option *ngFor="let item of availableIngredients" [value]="item">
+                    {{ item }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+    
+            <td class="p-2 w-1/4">
+              <mat-form-field class="w-full" appearance="fill" color="primary">
+                <mat-label>Measure</mat-label>
+                <mat-select formControlName="measure">
+                  <mat-option *ngFor="let unit of availableMeasures" [value]="unit">
+                    {{ unit }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+    
+            <td class="p-2 w-1/4">
+              <mat-form-field class="w-full" appearance="fill" color="primary">
+                <mat-label>Value</mat-label>
+                <input matInput type="number" formControlName="value" class="bg-gray-700 text-gray-100" />
+              </mat-form-field>
+            </td>
+    
+            <td class="text-right p-2">
+              <button mat-icon-button color="warn" (click)="removeIngredient(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    
+      <div class="pt-2">
+        <button mat-stroked-button color="primary" (click)="addIngredient()">+ Add Ingredient</button>
+      </div>
+    </section>
+    
+    <section>
+      <h3 class="text-lg font-medium mb-2">Images</h3>
+      <table class="w-full text-sm border border-gray-700 bg-gray-800 text-gray-100">
+        <thead class="bg-gray-900 text-gray-100">
+          <tr>
+            <th class="p-2 text-left">Image URL</th>
+            <th class="p-2 text-left">Description</th>
+            <th class="p-2 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="images">
+          <tr *ngFor="let img of images.controls; let i = index" [formGroupName]="i" class="border-b border-gray-700">
+            <td class="p-2 w-2/3">
+              <input matInput formControlName="image" class="w-full bg-gray-700 text-gray-100" />
+            </td>
+            <td class="p-2 w-1/3">
+              <input matInput formControlName="description" class="w-full bg-gray-700 text-gray-100" />
+            </td>
+            <td class="text-right p-2">
+              <button mat-icon-button color="warn" (click)="removeImage(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button mat-stroked-button color="primary" (click)="addImage()">+ Add Image</button>
+    </section>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Note</mat-label>
-        <input matInput formControlName="note" maxlength="120" />
-        <mat-hint align="end">{{ (formGroup.get('note')?.value?.length || 0) }}/120</mat-hint>
-      </mat-form-field>
-    </div>
+    <section>
+      <h3 class="text-lg font-medium mb-2">Macronutrients</h3>
+      <div class="grid grid-cols-3 gap-3">
+        <mat-form-field *ngFor="let field of macronutrientFields" appearance="fill">
+          <mat-label>{{ field }}</mat-label>
+          <input matInput type="number" [formControlName]="field" />
+        </mat-form-field>
+      </div>
+    </section>
 
-    <!-- Actions -->
-    <div class="flex justify-end gap-2 pt-2">
-      <button type="button" class="btn btn-ghost" (click)="onClose()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">Add</button>
+    <section>
+      <h3 class="text-lg font-medium mb-2">Cook Info</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <mat-form-field appearance="fill">
+          <mat-label>Time</mat-label>
+          <input matInput formControlName="time" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Yield</mat-label>
+          <input matInput type="number" formControlName="yieldVal" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Serving Size</mat-label>
+          <input matInput type="number" formControlName="servingSize" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Note</mat-label>
+          <input matInput formControlName="note" />
+        </mat-form-field>
+      </div>
+    </section>
+
+    <div class="flex justify-end gap-3 pt-4">
+      <button mat-stroked-button color="warn" type="button" (click)="onClose()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit">Save Dish</button>
     </div>
   </form>
 </div>
