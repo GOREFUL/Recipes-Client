@@ -1,54 +1,68 @@
-<div
-  class="card p-6 max-h-[90vh] overflow-y-auto space-y-6 w-[90vw] max-w-[1200px] mx-auto bg-gray-900 text-gray-100"
->
-  <button
-    class="flex items-center gap-2 text-gray-400 hover:text-white transition"
-    (click)="onBack()"
-  >
+<div class="card p-6 max-h-[90vh] overflow-y-auto space-y-6 w-[90vw] max-w-[1200px] mx-auto bg-gray-900 text-gray-100">
+  <!-- Back -->
+  <button class="flex items-center gap-2 text-gray-400 hover:text-white transition" (click)="onBack()">
     <mat-icon>arrow_back</mat-icon>
     <span>Back to Posts</span>
   </button>
 
-  <section>
-    <h2 class="text-3xl font-semibold text-gray-100 mb-2">{{ post?.title }}</h2>
-    <p class="text-gray-300 mb-4">{{ post?.description }}</p>
+  <!-- Header -->
+  <section *ngIf="post as p">
+    <h2 class="text-3xl font-semibold text-gray-100 mb-2">{{ p.name }}</h2>                 <button class="btn btn-soft px-3 py-1 !rounded-full flex items-center gap-2"
+                title="Like"
+                (click)="onLike(+1)">
+          <mat-icon>thumb_up</mat-icon>
+          <span>{{ p.likes ?? 0 }}</span>
+        </button>
+
+
+        <button class="btn btn-soft px-3 py-1 !rounded-full flex items-center gap-2"
+                title="Dislike"
+                (click)="onDislike(+1)">
+         <mat-icon>thumb_down</mat-icon>
+        <span>{{ p.dislikes ?? 0 }}</span>
+         </button>
+    <p class="text-gray-300 mb-4">{{ p.description }}</p>
   </section>
 
+  <!-- Media (image/video) -->
   <section *ngIf="post?.mediaUrl">
-    <h3 class="text-lg font-medium mb-2 text-gray-100">Image</h3>
-    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-md">
-      <img
-        [src]="post.mediaUrl"
-        alt="Post image"
-        class="w-full max-h-[500px] object-cover"
-      />
+    <h3 class="text-lg font-medium mb-2 text-gray-100">Media</h3>
+
+    <!-- video -->
+    <div *ngIf="isVideo(post?.mediaUrl); else imageBlock" class="bg-gray-800 rounded-lg overflow-hidden shadow-md">
+      <video [src]="post?.mediaUrl" controls class="w-full max-h-[500px]"></video>
     </div>
+
+    <!-- image -->
+    <ng-template #imageBlock>
+      <div class="bg-gray-800 rounded-lg overflow-hidden shadow-md">
+        <img [src]="post?.mediaUrl" alt="Post media" class="w-full  object-cover" />
+      </div>
+    </ng-template>
   </section>
 
-  <section *ngIf="relatedDish">
+  <!-- Related Dish -->
+  <section *ngIf="relatedDish as d">
     <h3 class="text-lg font-medium mb-2 text-gray-100">Related Dish</h3>
     <div
       class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 transition"
-      (click)="onSelectDish(relatedDish)"
+      (click)="onSelectDish(d)"
     >
       <div>
-        <p class="text-lg font-semibold text-gray-100">{{ relatedDish.name }}</p>
+        <p class="text-lg font-semibold text-gray-100">{{ d.name }}</p>
         <p class="text-sm text-gray-400 truncate max-w-[300px]">
-          {{ relatedDish.description }}
+          {{ d.description }}
         </p>
       </div>
       <mat-icon>arrow_forward</mat-icon>
     </div>
   </section>
 
-  <section class="grid grid-cols-2 md:grid-cols-3 gap-3" *ngIf="post">
-    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
-      <p class="text-gray-400 text-sm">Post ID</p>
-      <p>{{ post.id }}</p>
-    </div>
-    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
-      <p class="text-gray-400 text-sm">Dish ID</p>
-      <p>{{ post.dishId }}</p>
+  <!-- Meta: только создано -->
+  <section *ngIf="post as p">
+    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700" *ngIf="p['createdAt']">
+      <p class="text-gray-400 text-sm">Created</p>
+      <p>{{ p['createdAt'] | date:'medium' }}</p>
     </div>
   </section>
 </div>

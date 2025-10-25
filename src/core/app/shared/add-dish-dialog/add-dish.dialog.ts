@@ -1,11 +1,12 @@
-import { Component, inject } from '@angular/core';
+// src/core/app/shared/add-dish-dialog/add-dish.dialog.ts
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
-  FormGroup,
   FormArray,
   Validators,
   ReactiveFormsModule,
+  FormGroup,
 } from '@angular/forms';
 
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -16,12 +17,39 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 
-import { ModelFactory } from '../../../factories/model.factory';
-import { Dish } from '../../../models/entities/recipes-api/business/dish.entity';
-import { Ingredient } from '../../../models/entities/recipes-api/business/ingredient.entity';
-import { Image } from '../../../models/entities/recipes-api/business/image.entity';
-import { Allergy } from '../../../models/entities/recipes-api/business/allergy.entity';
-import { Cuisine } from '../../../models/entities/recipes-api/business/cuisine.entity';
+import { HttpErrorResponse } from '@angular/common/http';
+import { DishSrvc } from '../../../services/network/dish.service';
+import { LookupsSrvc, Lookup } from '../../../services/network/lookups.service';
+
+// === DTO, которое ждёт бэкенд на POST /api/dishes ===
+type CreateDishDto = {
+  name: string;
+  description?: string;
+  info: {
+    levelId: number;         // <- levelId внутри info
+    time: string;            // 'HH:mm:ss'
+    yield: number;
+    servingSize: number;
+    note?: string;
+    macros: {
+      kcal: number;
+      saturatedFat: number;
+      transFat: number;
+      sugars: number;
+      fiber: number;
+      protein: number;
+      salt: number;
+    };
+  };
+  ingredients: Array<{
+    ingredientId: number;
+    measurementUnitId: number;
+    value: number;
+  }>;
+  imageUrls: Array<{ url: string }>;
+  allergyIds: number[];
+  cuisineIds: number[];
+};
 
 @Component({
   selector: 'rcps-add-dish-dialog',
@@ -39,22 +67,18 @@ import { Cuisine } from '../../../models/entities/recipes-api/business/cuisine.e
     MatOptionModule,
   ],
 })
-export class AddDishDialog {
-  private readonly _dialogRef = inject(MatDialogRef<AddDishDialog>);
-  private readonly _fb = inject(FormBuilder);
+export class AddDishDialog implements OnInit {
+  private dialogRef = inject(MatDialogRef<AddDishDialog, boolean>);
+  private fb = inject(FormBuilder);
+  private lookups = inject(LookupsSrvc);
+  private dishApi = inject(DishSrvc);
 
-  availableAllergies: Allergy[] = [
-    { name: 'Gluten' },
-    { name: 'Peanuts' },
-    { name: 'Lactose' },
-  ];
-
-  availableCuisines: Cuisine[] = [
-    { name: 'Italian' },
-    { name: 'Japanese' },
-    { name: 'Ukrainian' },
-    { name: 'Mexican' },
-  ];
+  // --- Lookups ---
+  ingredientsLkp: Lookup[] = [];
+  unitsLkp: Lookup[] = [];
+  allergiesLkp: Lookup[] = [];
+  cuisinesLkp: Lookup[] = [];
+  levelsLkp: Lookup[] = [];
 
   macronutrientFields = [
     'kcal',
@@ -66,36 +90,20 @@ export class AddDishDialog {
     'salt',
   ];
 
-  availableIngredients: string[] = [
-    'Tomato',
-    'Cheese',
-    'Chicken Breast',
-    'Rice',
-    'Pasta',
-    'Milk',
-    'Salt',
-    'Sugar',
-  ];
-  
-  availableMeasures: string[] = [
-    'g',
-    'kg',
-    'ml',
-    'l',
-    'pcs',
-    'tbsp',
-    'tsp',
-  ];
-
-  formGroup = this._fb.group({
+  // --- Форма ---
+  formGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(100)]],
     description: ['', [Validators.maxLength(500)]],
-    cuisines: [[]],
-    allergies: [[]],
 
-    ingredients: this._fb.array([]),
-    images: this._fb.array([]),
+    levelId: [null as number | null, Validators.required],
+    allergyIds: this.fb.control<number[]>([]),
+    cuisineIds: this.fb.control<number[]>([]),
 
+    // списки
+    ingredients: this.fb.array([] as FormGroup[]),
+    images: this.fb.array([] as FormGroup[]),
+
+    // макросы
     kcal: ['0'],
     saturatedFat: ['0'],
     transFat: ['0'],
@@ -104,102 +112,124 @@ export class AddDishDialog {
     protein: ['0'],
     salt: ['0'],
 
-    time: [''],
+    // cook info
+    time: [''],          // input[type=time] вернёт 'HH:mm'
     yieldVal: ['0'],
     servingSize: ['0'],
     note: [''],
   });
 
-  get ingredients(): FormArray {
-    return this.formGroup.get('ingredients') as FormArray;
+  // --- геттеры для массивов формы ---
+  get ingredientsFA(): FormArray<FormGroup> {
+    return this.formGroup.get('ingredients') as FormArray<FormGroup>;
+  }
+  get imagesFA(): FormArray<FormGroup> {
+    return this.formGroup.get('images') as FormArray<FormGroup>;
   }
 
-  get images(): FormArray {
-    return this.formGroup.get('images') as FormArray;
+  // --- init ---
+  ngOnInit(): void {
+    this.lookups.levels().subscribe(v => (this.levelsLkp = v));
+    this.lookups.allergies().subscribe(v => (this.allergiesLkp = v));
+    this.lookups.cuisines().subscribe(v => (this.cuisinesLkp = v));
+    this.lookups.measureUnits().subscribe(v => (this.unitsLkp = v));
+
+    // ВАЖНО: ingredients — пагинированный ответ, нужен .items
+this.lookups.ingredients('', 1, 200).subscribe(v => (this.ingredientsLkp = v));
   }
 
-  // Добавление ингредиента
+  onIngredientSearch(q: string) {
+this.lookups.ingredients(q, 1, 50).subscribe(v => (this.ingredientsLkp = v));
+  }
+
+  // ====== И Н Г Р Е Д И Е Н Т Ы ======
   addIngredient(): void {
-    const ing = this._fb.group({
-      name: [''],
-      measure: [''],
-      value: ['0'],
-    });
-    this.ingredients.push(ing);
+    this.ingredientsFA.push(
+      this.fb.group({
+        ingredientId: [null, Validators.required],
+        measurementUnitId: [null, Validators.required],
+        value: [0, [Validators.required, Validators.min(0)]],
+      })
+    );
   }
 
-  removeIngredient(index: number): void {
-    this.ingredients.removeAt(index);
+  removeIngredient(i: number): void {
+    this.ingredientsFA.removeAt(i);
   }
 
-  // Добавление изображения
+  // ====== И З О Б Р А Ж Е Н И Я ======
   addImage(): void {
-    const img = this._fb.group({
-      image: [''],
-      description: [''],
-    });
-    this.images.push(img);
+    this.imagesFA.push(
+      this.fb.group({
+        url: ['', [Validators.required]],
+        // описание можно держать для UI, но на бэкенд не уходит
+        description: [''],
+      })
+    );
   }
 
-  removeImage(index: number): void {
-    this.images.removeAt(index);
+  removeImage(i: number): void {
+    this.imagesFA.removeAt(i);
   }
 
+  // ====== SUBMIT ======
   onSubmit(): void {
     if (this.formGroup.invalid) {
       this.formGroup.markAllAsTouched();
       return;
     }
-  
+
     const v = this.formGroup.value;
-  
-    const rawIngredients = (v.ingredients || []) as Array<{ name?: string; value?: any; measure?: string }>;
-    const rawImages = (v.images || []) as Array<{ image?: string; description?: string }>;
-    const rawAllergies = (v.allergies || []) as Array<string>;
-    const rawCuisines = (v.cuisines || []) as Array<string>;
-  
-    const ingredients = rawIngredients.map(i =>
-      ModelFactory.createIngredient(i.name || '', Number(i.value || 0), i.measure || '')
-    );
-  
-    const images = rawImages.map(i =>
-      ModelFactory.createImage(i.image || '', i.description || '')
-    );
-  
-    const allergies = rawAllergies.map(a => ModelFactory.createAllergy(a || ''));
-  
-    const cuisines = rawCuisines.map(c => ModelFactory.createCuisine(c || ''));
-  
-    const dish: Dish = ModelFactory.createDish(
-      0,
-      v.name!,
-      v.description || '',
-      ModelFactory.createCookInfo(
-        v.time || '',
-        Number(v.yieldVal),
-        Number(v.servingSize),
-        v.note || ''
-      ),
-      ModelFactory.createMacronutrients(
-        Number(v.kcal),
-        Number(v.saturatedFat),
-        Number(v.transFat),
-        Number(v.sugars),
-        Number(v.fiber),
-        Number(v.protein),
-        Number(v.salt)
-      ),
+
+    const ingredients = this.ingredientsFA.controls.map(g => ({
+      ingredientId: Number(g.value.ingredientId),
+      measurementUnitId: Number(g.value.measurementUnitId),
+      value: Number(g.value.value) || 0,
+    }));
+
+    const imageUrls = this.imagesFA.controls
+      .map(g => (g.value.url || '').trim())
+      .filter(Boolean)
+      .map(url => ({ url }));
+
+    // input[type="time"] даёт 'HH:mm' — дополнить до 'HH:mm:ss'
+    const rawTime = (v.time as string) || '00:00';
+    const time = rawTime.length === 5 ? `${rawTime}:00` : rawTime;
+
+    const dto: CreateDishDto = {
+      name: (v.name || '').trim(),
+      description: (v.description || '').trim(),
+      info: {
+        levelId: Number(v.levelId), // <- переносим levelId сюда
+        time,
+        yield: Number(v.yieldVal) || 0,
+        servingSize: Number(v.servingSize) || 0,
+        note: (v.note || '').trim(),
+        macros: {
+          kcal: Number(v.kcal) || 0,
+          saturatedFat: Number(v.saturatedFat) || 0,
+          transFat: Number(v.transFat) || 0,
+          sugars: Number(v.sugars) || 0,
+          fiber: Number(v.fiber) || 0,
+          protein: Number(v.protein) || 0,
+          salt: Number(v.salt) || 0,
+        },
+      },
       ingredients,
-      images,
-      allergies,
-      cuisines
-    );
-  
-    this._dialogRef.close(dish);
+      imageUrls,
+      allergyIds: (v.allergyIds as number[]) || [],
+      cuisineIds: (v.cuisineIds as number[]) || [],
+    };
+
+this.dishApi.create(dto).subscribe({
+  next: () => this.dialogRef.close(true),   // закрываем молча при успехе
+  error: () => this.dialogRef.close(false), // закрываем молча и при ошибке
+});
+
+
   }
-  
 
   onClose(): void {
-    this._dialogRef.close();
+    this.dialogRef.close();
   }
 }

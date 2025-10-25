@@ -1,41 +1,31 @@
-<div
-  class="card p-6 max-h-[90vh] overflow-y-auto space-y-6 w-[90vw] max-w-[1200px] mx-auto bg-gray-900 text-gray-100"
->
-  <button
-    class="flex items-center gap-2 text-gray-400 hover:text-white transition"
-    (click)="onBack()"
-  >
+<div class="card p-6 max-h-[90vh] overflow-y-auto space-y-6 w-[90vw] max-w-[1200px] mx-auto bg-gray-900 text-gray-100">
+  <!-- Back -->
+  <button class="flex items-center gap-2 text-gray-400 hover:text-white transition" (click)="onBack()">
     <mat-icon>arrow_back</mat-icon>
     <span>Back to Dishes</span>
   </button>
 
-  <section>
-    <h2 class="text-3xl font-semibold text-gray-100 mb-2">{{ dish?.name }}</h2>
-    <p class="text-gray-300">{{ dish?.description }}</p>
+  <!-- header -->
+  <section *ngIf="dish as d">
+    <h2 class="text-3xl font-semibold text-gray-100 mb-2">{{ d.name }}</h2>
+    <p class="text-gray-300">{{ d.description }}</p>
   </section>
 
+  <!-- images -->
   <section *ngIf="dish?.images?.length">
     <h3 class="text-lg font-medium mb-2 text-gray-100">Images</h3>
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      <div
-        *ngFor="let img of dish.images"
-        class="bg-gray-800 rounded-lg overflow-hidden shadow-md"
-      >
-        <img
-          [src]="img.image"
-          alt="Dish image"
-          class="w-full h-48 object-cover"
-        />
-        <p class="p-2 text-sm text-gray-300">{{ img.description }}</p>
+      <div *ngFor="let img of dish!.images" class="bg-gray-800 rounded-lg overflow-hidden shadow-md">
+        <img [src]="img.url" alt="Dish image" class="w-full h-48 object-cover" />
+        <p class="p-2 text-sm text-gray-300" *ngIf="img.description">{{ img.description }}</p>
       </div>
     </div>
   </section>
 
+  <!-- ingredients -->
   <section *ngIf="dish?.ingredients?.length">
     <h3 class="text-lg font-medium mb-2 text-gray-100">Ingredients</h3>
-    <table
-      class="w-full text-sm border border-gray-700 bg-gray-800 text-gray-100"
-    >
+    <table class="w-full text-sm border border-gray-700 bg-gray-800 text-gray-100">
       <thead class="bg-gray-900 text-gray-100">
         <tr>
           <th class="p-2 text-left">Ingredient</th>
@@ -44,10 +34,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          *ngFor="let ing of dish.ingredients"
-          class="border-b border-gray-700"
-        >
+        <tr *ngFor="let ing of dish!.ingredients" class="border-b border-gray-700">
           <td class="p-2">{{ ing.name }}</td>
           <td class="p-2">{{ ing.measure }}</td>
           <td class="p-2">{{ ing.value }}</td>
@@ -56,14 +43,12 @@
     </table>
   </section>
 
+  <!-- cuisines & allergies -->
   <section class="grid grid-cols-2 gap-6">
     <div>
       <h3 class="text-lg font-medium mb-2 text-gray-100">Cuisines</h3>
       <div class="flex flex-wrap gap-2">
-        <span
-          *ngFor="let c of dish?.cuisines"
-          class="px-3 py-1 bg-gray-800 rounded-full text-sm text-gray-200"
-        >
+        <span *ngFor="let c of dish?.cuisines" class="px-3 py-1 bg-gray-800 rounded-full text-sm text-gray-200">
           {{ c.name }}
         </span>
       </div>
@@ -72,49 +57,46 @@
     <div>
       <h3 class="text-lg font-medium mb-2 text-gray-100">Allergies</h3>
       <div class="flex flex-wrap gap-2">
-        <span
-          *ngFor="let a of dish?.allergies"
-          class="px-3 py-1 bg-red-800 rounded-full text-sm text-gray-200"
-        >
+        <span *ngFor="let a of dish?.allergies" class="px-3 py-1 bg-red-800 rounded-full text-sm text-gray-200">
           {{ a.name }}
         </span>
       </div>
     </div>
   </section>
 
-  <section>
+  <!-- macronutrients -->
+  <section *ngIf="dish?.macronutrients as m">
     <h3 class="text-lg font-medium mb-2 text-gray-100">Macronutrients</h3>
     <div class="grid grid-cols-3 md:grid-cols-4 gap-3">
-      <div
-        class="bg-gray-800 p-3 rounded-lg text-center border border-gray-700"
-        *ngFor="let key of macronutrientKeys"
-      >
+      <div class="bg-gray-800 p-3 rounded-lg text-center border border-gray-700" *ngFor="let key of macronutrientKeys">
         <p class="text-gray-400 text-sm capitalize">{{ key }}</p>
-        <p class="text-lg font-semibold">{{ dish?.macronutrients[key] }}</p>
+        <p class="text-lg font-semibold">{{ m[key] ?? 0 }}</p>
       </div>
     </div>
   </section>
 
-  <section *ngIf="dish?.cookInfo">
+  <!-- cook info -->
+  <section *ngIf="dish as d">
     <h3 class="text-lg font-medium mb-2 text-gray-100">Cook Info</h3>
     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
       <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
         <p class="text-gray-400 text-sm">Time</p>
-        <p>{{ dish?.cookInfo.time }}</p>
+        <p>{{ d.cookInfo?.time || '-' }}</p>
       </div>
+
       <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
         <p class="text-gray-400 text-sm">Yield</p>
-        <p>{{ dish?.cookInfo.yieldVal }}</p>
+        <p>{{ d.cookInfo?.yieldVal ?? '-' }}</p>
       </div>
+
       <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
         <p class="text-gray-400 text-sm">Serving Size</p>
-        <p>{{ dish?.cookInfo.servingSize }}</p>
+        <p>{{ d.cookInfo?.servingSize ?? '-' }}</p>
       </div>
-      <div
-        class="bg-gray-800 p-3 rounded-lg border border-gray-700 col-span-2 md:col-span-3"
-      >
+
+      <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 col-span-2 md:col-span-3" *ngIf="d.cookInfo?.note">
         <p class="text-gray-400 text-sm">Note</p>
-        <p>{{ dish?.cookInfo.note }}</p>
+        <p>{{ d.cookInfo?.note }}</p>
       </div>
     </div>
   </section>

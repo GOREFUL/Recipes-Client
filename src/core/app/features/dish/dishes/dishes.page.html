@@ -1,6 +1,6 @@
 <section class="w-full space-y-6">
   <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-4 p-4">
-    <h1 class="text-2xl font-bold" style="color: var(--text)">Dishes</h1>
+    <h1 class="text-2xl font-bold" style="color: var(--text)">My Dishes</h1>
 
     <div class="flex flex-wrap gap-2">
       <button class="btn btn-primary btn-lg" (click)="onAdd()">
@@ -13,14 +13,29 @@
     </div>
   </div>
 
-  <div *ngIf="dishSrvc.dishes.length; else emptyState" class="grid gap-4">
-    <rcps-dish-item
-  *ngFor="let dish of dishSrvc.dishes()"
-  [dish]="dish"
-  (click)="onSelectDish(dish)"
-  (edit)="onEdit(dish)"
-  (delete)="onDelete(dish)"
-/>
+  <!-- ВАЖНО: у signal нужно вызывать функцию, иначе .length упадёт -->
+  <div *ngIf="dishSrvc.dishes().length; else emptyState" class="grid gap-4">
+    <div
+      *ngFor="let dish of dishSrvc.dishes()"
+      class="flex items-start justify-between p-4 rounded-xl"
+      style="background: var(--panel)"
+    >
+      <div class="cursor-pointer flex-1" (click)="onOpen(dish)">
+        <h3 class="text-lg font-semibold">{{ dish.name }}</h3>
+        <p class="opacity-70">{{ dish.description }}</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- редактирование убираем -->
+        <button class="btn btn-ghost" (click)="onOpen(dish)" title="Details">
+          <mat-icon>open_in_new</mat-icon>
+        </button>
+
+        <button class="btn btn-ghost" (click)="onDelete(dish)" title="Delete">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
   </div>
 
   <ng-template #emptyState>
@@ -29,5 +44,4 @@
       <p>No dishes found. Add a new one to get started.</p>
     </div>
   </ng-template>
-  
 </section>

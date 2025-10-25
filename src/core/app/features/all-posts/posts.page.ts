@@ -1,53 +1,60 @@
-import { Component, inject, OnInit } from '@angular/core';
+// src/core/app/features/post/posts/posts.page.ts
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 import { AddPostDialog } from '../../shared/add-post-dialog/add-post.dialog';
-import { PostItem } from '../../shared/post-card/post.item';
-
-import { PostSrvc } from '../../../services/network/post.service';
-import { Post } from '../../../models/entities/recipes-api/business/post.entity';
+import { PostSrvc, Post, PostDto } from '../../../services/network/post.service';
 
 @Component({
   selector: 'rcps-posts-page',
+  standalone: true,
   templateUrl: 'posts.page.html',
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatIconModule,
-    PostItem,
-  ],
+  imports: [CommonModule, MatButtonModule, MatIconModule],
 })
 export class PostsPage implements OnInit {
-  private readonly matDialog = inject(MatDialog);
-  private readonly router = inject(Router);
-  public readonly postSrvc = inject(PostSrvc);
+  private dialog = inject(MatDialog);
+  private router = inject(Router);
+  public postSrvc = inject(PostSrvc);
 
   ngOnInit(): void {
-    this.postSrvc.loadAll();
+    this.postSrvc.loadMine();
   }
-  public onAdd(): void {
-    const dialogRef = this.matDialog.open(AddPostDialog, {
+
+  onAdd(): void {
+    const ref = this.dialog.open(AddPostDialog, {
       width: '600px',
       disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe((value: Post | undefined) => {
-      if (value) {
-        this.postSrvc.create(value).subscribe(() => this.postSrvc.loadAll());
-      }
+    ref.afterClosed().subscribe((dto?: PostDto) => {
+      if (!dto) return;
+      this.postSrvc.create(dto).subscribe({
+        next: () => this.postSrvc.loadMine(),
+        error: () => this.postSrvc.loadMine(),
+      });
     });
   }
 
-  public onRefresh(): void {
-    this.postSrvc.loadAll();
+  onRefresh(): void {
+    this.postSrvc.loadMine();
   }
 
-  public onSelectPost(post: Post): void {
+  onOpen(post: Post): void {
+    if (!post?.id) return;
     this.router.navigate(['/posts', post.id]);
+  }
+
+  onDelete(post: Post): void {
+    if (!post?.id) return;
+    if (!confirm('Delete this post?')) return;
+
+    this.postSrvc.delete(post.id).subscribe({
+      next: () => this.postSrvc.loadMine(),
+      error: () => this.postSrvc.loadMine(),
+    });
   }
 }

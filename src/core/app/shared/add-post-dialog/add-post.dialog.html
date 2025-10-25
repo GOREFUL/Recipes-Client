@@ -1,3 +1,4 @@
+<!-- src/core/app/shared/add-post-dialog/add-post.dialog.html -->
 <div class="card p-5">
   <h2 class="text-xl font-semibold mb-4" style="color:var(--text)">Add New Post</h2>
 
@@ -30,17 +31,16 @@
       <mat-error *ngIf="f.description.hasError('maxlength')">Max 500 characters</mat-error>
     </mat-form-field>
 
-    <!-- Image URL -->
+    <!-- Image/Video URL -->
     <mat-form-field class="w-full" appearance="fill">
-      <mat-label>Image URL*</mat-label>
+      <mat-label>Media URL*</mat-label>
       <input matInput formControlName="mediaUrl" required />
-      <mat-hint>https://example.com/image.jpg</mat-hint>
+      <mat-hint>https://… (image or video)</mat-hint>
       <mat-error *ngIf="f.mediaUrl.touched && f.mediaUrl.invalid">
-        Please enter a valid image URL
+        Please enter a valid URL
       </mat-error>
     </mat-form-field>
 
-    <!-- Actions -->
     <div class="flex justify-end gap-2 pt-2">
       <button type="button" class="btn btn-ghost" (click)="onClose()">Cancel</button>
       <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">

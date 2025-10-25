@@ -24,6 +24,7 @@ export interface Me {
 export class AuthSrvc {
   private http   = inject(HttpClient);
   private afAuth = inject(Auth);
+  private readonly tokenKey = 'access_token';
 
   private base = `${environment.apiUrl}/identity`;
 
@@ -219,4 +220,24 @@ private registerOrLogin(email: string, password: string, displayName: string): O
 public googleRegister(): Observable<Me | null> {
   return this.googleLogin();
 }
+ getAccessToken(): string | null {
+    try { return localStorage.getItem(this.tokenKey); } catch { return null; }
+  }
+   getUserId(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    try {
+      const payload = JSON.parse(atob(parts[1]));
+      const id =
+        payload?.nameid ?? payload?.sub ?? payload?.uid ?? payload?.userId ?? null;
+      return typeof id === 'string' ? id : (id != null ? String(id) : null);
+    } catch {
+      return null;
+    }
+  }
+
 }

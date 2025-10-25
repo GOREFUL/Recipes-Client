@@ -11,7 +11,6 @@ import { SubscriptionComponent } from './features/subscription/subscription.page
 import { MealPlannerPage } from './features/meal-planner/meal-planner.page';
 import { RecipeAiPage } from './features/recipe-ai/recipe-ai.page';
 import { UserStatsPage } from './features/user-stats/user-stats.page';
-
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
 
@@ -59,7 +58,18 @@ export const routes: Routes = [
     path: 'subscription',
     component: SubscriptionComponent,
   },
-
+{
+  path: 'dishes/:id',
+  loadComponent: () =>
+    import('./features/dish/dishes/dish-details.page')
+      .then(m => m.DishDetailsPage),
+},
+{
+  path: 'posts/:id',
+  loadComponent: () =>
+    import('./features/all-posts/post-details.page')
+      .then(m => m.PostDetailsPage),
+},
   {
     path: '**',
     redirectTo: 'home',

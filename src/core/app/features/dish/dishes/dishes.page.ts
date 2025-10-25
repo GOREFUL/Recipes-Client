@@ -1,3 +1,4 @@
+// src/core/app/features/dish/dishes/dishes.page.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +9,7 @@ import { Router } from '@angular/router';
 import { AddDishDialog } from '../../../shared/add-dish-dialog/add-dish.dialog';
 import { DishItem } from '../../../shared/dish-item/dish.item';
 import { DishSrvc } from '../../../../services/network/dish.service';
-import { Dish } from '../../../../models/entities/recipes-api/business/dish.entity';
+import { MyDish } from '../../../../services/network/dish.service';
 
 @Component({
   selector: 'rcps-dishes-page',
@@ -16,16 +17,16 @@ import { Dish } from '../../../../models/entities/recipes-api/business/dish.enti
   imports: [CommonModule, MatButtonModule, MatIconModule, DishItem],
 })
 export class DishesPage implements OnInit {
-  private readonly matDialog = inject(MatDialog);
-  private readonly router = inject(Router);
-  public readonly dishSrvc = inject(DishSrvc);
+  private dialog = inject(MatDialog);
+  private router = inject(Router);
+  public dishSrvc = inject(DishSrvc);
 
   ngOnInit(): void {
     this.dishSrvc.loadAll();
   }
 
   onAdd(): void {
-    const dialogRef = this.matDialog.open(AddDishDialog, {
+    const ref = this.dialog.open(AddDishDialog, {
       width: '90vw',
       maxWidth: '1200px',
       height: '90vh',
@@ -33,26 +34,28 @@ export class DishesPage implements OnInit {
       panelClass: 'custom-dialog-container',
     });
 
-    dialogRef.afterClosed().subscribe((value: Dish | undefined) => {
-      if (value) {
-        this.dishSrvc.add(value);
-      }
+    // Диалог сам делает create; здесь просто рефрешим список
+    ref.afterClosed().subscribe(() => this.dishSrvc.loadAll());
+     this.router.navigate(['/dishes']);
+  }
+
+    onOpen(d: MyDish): void {
+    this.router.navigate(['/dishes', d.id]);
+  }
+
+  onDelete(d: MyDish): void {
+    this.dishSrvc.delete(d.id).subscribe({
+      next: () => this.dishSrvc.loadAll(),
+      error: (e) => console.warn('Delete failed', e),
     });
   }
-
-  onEdit(dish: Dish): void {
-    this.dishSrvc.update(dish);
-  }
-
-  onDelete(dish: Dish): void {
-    this.dishSrvc.delete(dish.id);
-  }
-
   onRefresh(): void {
     this.dishSrvc.loadAll();
   }
 
-  onSelectDish(dish: Dish): void {
+  onSelectDish(dish: any): void {
     this.router.navigate(['/dishes', dish.id]);
   }
+
+  trackById = (_: number, d: any) => d?.id;
 }

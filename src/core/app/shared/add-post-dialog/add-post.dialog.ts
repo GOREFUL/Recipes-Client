@@ -1,10 +1,8 @@
+// src/core/app/shared/add-post-dialog/add-post.dialog.ts
 /*
- * File        : add-post.dialog.ts
- * Description : Dialog for creating a new post (uses ModelFactory).
- * Author      : Kuts Vladyslav Ivanovich
+ * Dialog: Add Post
  */
-
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -15,8 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
-import { Post } from '../../../models/entities/recipes-api/business/post.entity';
-import { ModelFactory } from '../../../factories/model.factory';
+import { DishSrvc, MyDish } from '../../../services/network/dish.service';
+import { PostDto } from '../../../services/network/post.service';
 
 @Component({
   selector: 'rcps-add-post-dialog',
@@ -34,28 +32,35 @@ import { ModelFactory } from '../../../factories/model.factory';
   ],
 })
 export class AddPostDialog implements OnInit {
-  private readonly _dialogRef = inject(MatDialogRef<AddPostDialog>);
-  private readonly _fb = inject(FormBuilder);
+  private dialogRef = inject(MatDialogRef<AddPostDialog, PostDto | undefined>);
+  private fb = inject(FormBuilder);
+  private dishApi = inject(DishSrvc);
 
-  // Бэк сюда кидаь
   dishes: { id: number; name: string }[] = [];
 
-  formGroup = this._fb.group({
-    dishId: ['', Validators.required], 
+  formGroup = this.fb.group({
+    dishId: ['', Validators.required],
     title: ['', [Validators.required, Validators.maxLength(100)]],
     description: ['', [Validators.maxLength(500)]],
     mediaUrl: [
       '',
-      [Validators.required, Validators.pattern(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i)],
+      [
+        Validators.required,
+        // любая http/https ссылка (и картинка, и видео)
+        Validators.pattern(/^https?:\/\/\S+$/i),
+      ],
     ],
   });
 
-  get f() {
-    return this.formGroup.controls;
-  }
+  get f() { return this.formGroup.controls; }
 
   ngOnInit(): void {
-    // TODO: load dishes from backend
+    // единичный запрос "мои блюда" для выпадающего списка
+    this.dishApi.getMyOnce().subscribe({
+      next: (list: MyDish[]) =>
+        this.dishes = (list ?? []).map(d => ({ id: d.id, name: d.name })),
+      error: () => this.dishes = [],
+    });
   }
 
   onSubmit(): void {
@@ -63,21 +68,21 @@ export class AddPostDialog implements OnInit {
       this.formGroup.markAllAsTouched();
       return;
     }
+    const v = this.formGroup.value;
 
-    const { title, description, mediaUrl, dishId } = this.formGroup.value;
+    // Бэкенд ждёт именно такие поля:
+    // { name, description, dishId, mediaUrl }
+    const dto: PostDto = {
+      name: v.title!,                           // title -> name
+      description: v.description || '',
+      dishId: Number(v.dishId),
+      mediaUrl: v.mediaUrl!,                         // mediaUrl -> url
+    };
 
-    const post: Post = ModelFactory.createPost(
-      0,
-      mediaUrl!,
-      description || '',
-      title!,
-      Number(dishId)
-    );
-
-    this._dialogRef.close(post);
+    this.dialogRef.close(dto);
   }
 
   onClose(): void {
-    this._dialogRef.close();
+    this.dialogRef.close();
   }
 }

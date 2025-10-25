@@ -44,9 +44,9 @@ export class SidebarLayout
         UtilsFactory.createMenuItem('Register', 'person_add', '/register'),
       ]),*/
 
-      UtilsFactory.createMenuItem('Dishes', 'restaurant', '/dishes'),
+      UtilsFactory.createMenuItem('My Dishes', 'restaurant', '/dishes'),
 
-      UtilsFactory.createMenuItem('Posts', 'article', '/posts'),
+      UtilsFactory.createMenuItem('My Posts', 'article', '/posts'),
 
       UtilsFactory.createMenuItem('Planner', 'event', '/planner'),
 
@@ -56,6 +56,5 @@ export class SidebarLayout
 
       UtilsFactory.createMenuItem('Subscription', 'workspace_premium', '/subscription'),
 
-      UtilsFactory.createMenuItem('Settings', 'settings', '/settings')
   ]);
 }

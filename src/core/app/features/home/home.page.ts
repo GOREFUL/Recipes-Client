@@ -1,77 +1,39 @@
-/*
- * Files        : home.page.ts, home.page.html
- * Description  : Home page. Main page of the application.
- * Author       : Kuts Vladyslav Ivanovich
- */
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 
-import { PostItem } from '../../shared/post-card/post.item';
+import { PostSrvc, Post } from '../../../services/network/post.service';
 
-import { PostSrvc } from '../../../services/network/post.service';
-import { Post } from '../../../models/entities/recipes-api/business/post.entity';
-
-@Component
-({
+@Component({
   selector: 'rcps-home-page',
+  standalone: true,
   templateUrl: 'home.page.html',
-  imports:
-  [
-    CommonModule,
-
-    PostItem
-  ],
+  imports: [CommonModule, MatButtonModule, MatIconModule],
 })
-export class HomePage implements OnInit
-{
-  public readonly postSrvc: PostSrvc = inject(PostSrvc)
+export class HomePage implements OnInit {
+  private router = inject(Router);
+  public postSrvc = inject(PostSrvc);
 
-  public ngOnInit(): void
-  {
-    this.postSrvc.loadAll();
-
-    window.addEventListener('scroll', this.onScroll.bind(this));
+  ngOnInit(): void {
+    // При желании можно ограничить "за последние 24 часа"
+    // const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    // this.postSrvc.loadFresh({ sinceUtc: since, page: 1, pageSize: 20 });
+    this.postSrvc.loadFresh({ page: 1, pageSize: 20 });
   }
 
-  /*
-  public async loadPosts(): void
-  {
-    if (!this.hasMore())
-      return;
-
-    this.loading.set(true);
-    const nextPage = this.page();
-    const newPosts = await this.postService.loadPosts();
-
-    if (newPosts.length === 0)
-    {
-      this.hasMore.set(false);
-    }
-    else
-    {
-      this.posts.update(p => [...p, ...newPosts]);
-      this.page.update(p => p + 1);
-    }
-
-    this.loading.set(false);
+  isVideo(url?: string): boolean {
+    if (!url) return false;
+    return /\.(mp4|webm)(\?.*)?$/i.test(url);
   }
-  */
 
-  public onLike(post: Post): void
-  { this.postSrvc.like(post.id); }
+  open(post: Post) {
+    if (!post?.id) return;
+    this.router.navigate(['/posts', post.id]);
+  }
 
-  public onDislike(post: Post): void
-  { this.postSrvc.dislike(post.id); }
-
-  public onScroll(): void
-  {
-    const nearBottom =
-      window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-
-    if (nearBottom)
-    {
-      this.postSrvc.loadAll();
-    }
+  refresh() {
+    this.postSrvc.loadFresh({ page: 1, pageSize: 20 });
   }
 }

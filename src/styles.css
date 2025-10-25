@@ -289,3 +289,27 @@ body > * { position: relative; z-index: 1; }
 
 .spacer{ flex:1 }
 .muted{ color:var(--muted); }
+/* Тёмная панель для всех mat-select, где panelClass="dark-select" */
+.dark-select .mdc-menu-surface {
+  background: #0f172a !important;     /* тёмный фон панели */
+  color: #e5e7eb !important;          /* базовый цвет текста */
+}
+
+.dark-select .mat-mdc-option .mdc-list-item__primary-text {
+  color: #e5e7eb !important;          /* цвет текста опций */
+}
+
+.dark-select .mat-mdc-option.mdc-list-item--selected {
+  background: #1f2937 !important;     /* фон выбранной */
+}
+
+.dark-select .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  color: #ffffff !important;
+}
+
+.dark-select .mat-mdc-option.mdc-list-item--disabled {
+  color: #94a3b8 !important;
+}
+.dish-card{
+  margin:15px;
+}
