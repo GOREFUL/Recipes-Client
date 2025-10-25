@@ -57,4 +57,8 @@ export class PostsPage implements OnInit {
       error: () => this.postSrvc.loadMine(),
     });
   }
+
+  public onSelectPost(post: Post): void {
+    this.router.navigate(['/posts', post.id]);
+  }
 }
