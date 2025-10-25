@@ -14,16 +14,12 @@
       </div>
     </div>
   
-    <!-- Posts List -->
     <div *ngIf="postSrvc.posts() as posts; else emptyState" class="grid gap-4">
       <rcps-post-item
         *ngFor="let post of posts"
-        [post]="post"
-        (like)="onLike(post)"
-        (dislike)="onDislike(post)" />
+        [post]="post"/>
     </div>
   
-    <!-- Empty State -->
     <ng-template #emptyState>
       <div class="text-center py-20" style="color: var(--muted)">
         <mat-icon class="text-4xl mb-2">video_library</mat-icon>

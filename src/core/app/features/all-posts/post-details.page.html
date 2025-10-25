@@ -1,0 +1,54 @@
+<div
+  class="card p-6 max-h-[90vh] overflow-y-auto space-y-6 w-[90vw] max-w-[1200px] mx-auto bg-gray-900 text-gray-100"
+>
+  <button
+    class="flex items-center gap-2 text-gray-400 hover:text-white transition"
+    (click)="onBack()"
+  >
+    <mat-icon>arrow_back</mat-icon>
+    <span>Back to Posts</span>
+  </button>
+
+  <section>
+    <h2 class="text-3xl font-semibold text-gray-100 mb-2">{{ post?.title }}</h2>
+    <p class="text-gray-300 mb-4">{{ post?.description }}</p>
+  </section>
+
+  <section *ngIf="post?.mediaUrl">
+    <h3 class="text-lg font-medium mb-2 text-gray-100">Image</h3>
+    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-md">
+      <img
+        [src]="post.mediaUrl"
+        alt="Post image"
+        class="w-full max-h-[500px] object-cover"
+      />
+    </div>
+  </section>
+
+  <section *ngIf="relatedDish">
+    <h3 class="text-lg font-medium mb-2 text-gray-100">Related Dish</h3>
+    <div
+      class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex justify-between items-center cursor-pointer hover:bg-gray-700 transition"
+      (click)="onSelectDish(relatedDish)"
+    >
+      <div>
+        <p class="text-lg font-semibold text-gray-100">{{ relatedDish.name }}</p>
+        <p class="text-sm text-gray-400 truncate max-w-[300px]">
+          {{ relatedDish.description }}
+        </p>
+      </div>
+      <mat-icon>arrow_forward</mat-icon>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-2 md:grid-cols-3 gap-3" *ngIf="post">
+    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+      <p class="text-gray-400 text-sm">Post ID</p>
+      <p>{{ post.id }}</p>
+    </div>
+    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+      <p class="text-gray-400 text-sm">Dish ID</p>
+      <p>{{ post.dishId }}</p>
+    </div>
+  </section>
+</div>
