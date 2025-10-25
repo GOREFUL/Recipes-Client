@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-import { Post } from '../../../models/entities/recipes-api/business/post.entity'; // 👈 твой интерфейс
+import { Post } from '../../../models/entities/recipes-api/business/post.entity';
 
 @Component({
   selector: 'rcps-post-item',

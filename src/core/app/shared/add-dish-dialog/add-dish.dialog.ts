@@ -57,13 +57,13 @@ export class AddDishDialog {
   ];
 
   macronutrientFields = [
-    'Kcal',
-    'SaturatedFat',
-    'TransFat',
-    'Sugars',
-    'Fiber',
-    'Protein',
-    'Salt',
+    'kcal',
+    'saturatedFat',
+    'transFat',
+    'sugars',
+    'fiber',
+    'protein',
+    'salt',
   ];
 
   availableIngredients: string[] = [
